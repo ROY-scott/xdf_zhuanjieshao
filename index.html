@@ -1,0 +1,1615 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>新东方 · 学员转介绍推荐登记</title>
+<style>
+  :root{
+    --bg:#f4f6f9; --card:#ffffff; --border:#e3e8ef; --border-strong:#d0d7de;
+    --text:#1f2328; --muted:#57606a;
+    --brand:#00a050; --brand-dark:#00763b; --brand-soft:#e8f7ef;
+    --danger:#cf222e; --danger-soft:#fdeced;
+    --warn:#bf8700; --warn-soft:#fff8e5;
+    --blue:#0969da;
+    --shadow:0 1px 2px rgba(16,24,40,.04), 0 8px 24px rgba(16,24,40,.06);
+  }
+  *{box-sizing:border-box;}
+  body{
+    margin:0;background:var(--bg);color:var(--text);
+    font-family:"Microsoft YaHei","PingFang SC","Helvetica Neue",Arial,sans-serif;
+    font-size:14px;line-height:1.6;-webkit-font-smoothing:antialiased;
+  }
+  .hidden{display:none !important;}
+
+  /* ============ 顶部栏 ============ */
+  .topbar{
+    background:linear-gradient(120deg,#00994d 0%,#00b45c 100%);
+    color:#fff;padding:16px 24px;
+    display:flex;align-items:center;gap:20px;flex-wrap:wrap;
+    box-shadow:0 2px 12px rgba(0,120,60,.18);
+    position:sticky;top:0;z-index:20;
+  }
+  .brand{display:flex;align-items:center;gap:12px;flex:none;}
+  /* 品牌标牌：logo 本身是深绿+橙，放在绿色头部上会糊，所以垫一块白底 */
+  .logo{
+    background:#fff;border-radius:10px;padding:7px 11px;
+    display:flex;align-items:center;justify-content:center;flex:none;
+    box-shadow:0 2px 8px rgba(0,0,0,.13);
+  }
+  .logo img{height:32px;width:auto;display:block;}
+  .brand h1{margin:0;font-size:17px;font-weight:700;letter-spacing:.3px;}
+  .brand p{margin:1px 0 0;font-size:12px;opacity:.85;}
+
+  .tabs{display:flex;gap:6px;background:rgba(255,255,255,.16);padding:4px;border-radius:11px;}
+  .tab{
+    border:none;background:none;color:#fff;opacity:.8;
+    font-family:inherit;font-size:13.5px;font-weight:600;
+    padding:7px 18px;border-radius:8px;cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .tab:hover{opacity:1;}
+  .tab.active{background:#fff;color:var(--brand-dark);opacity:1;}
+
+  .user-area{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:12.5px;}
+  .user-chip{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.3);
+    padding:5px 12px;border-radius:999px;max-width:240px;
+    overflow:hidden;text-overflow:ellipsis;white-space:nowrap;
+  }
+  .role-badge{
+    background:#fff;color:var(--brand-dark);font-weight:700;
+    padding:2px 9px;border-radius:999px;font-size:11.5px;
+  }
+  .user-btn{
+    background:rgba(255,255,255,.18);border:1px solid rgba(255,255,255,.35);
+    color:#fff;font-family:inherit;font-size:12.5px;font-weight:600;
+    padding:6px 14px;border-radius:999px;cursor:pointer;transition:all .15s;white-space:nowrap;
+  }
+  .user-btn:hover{background:rgba(255,255,255,.3);}
+
+  /* ============ 布局 ============ */
+  .page{max-width:1400px;margin:0 auto;padding:22px 24px 56px;}
+  .grid{display:grid;grid-template-columns:400px minmax(0,1fr);gap:20px;align-items:start;}
+  @media (max-width:1080px){.grid{grid-template-columns:1fr;}}
+
+  .card{
+    background:var(--card);border:1px solid var(--border);
+    border-radius:14px;box-shadow:var(--shadow);padding:20px 22px 22px;
+  }
+  .card h2{margin:0 0 16px;font-size:15px;font-weight:700;display:flex;align-items:center;gap:8px;}
+  .card h2::before{content:"";width:4px;height:15px;border-radius:2px;background:var(--brand);}
+
+  /* ============ 横幅提示 ============ */
+  .banner{border-radius:11px;padding:12px 16px;font-size:13px;margin-bottom:18px;display:flex;gap:9px;align-items:flex-start;}
+  .banner.warn{background:var(--warn-soft);border:1px solid #f0d9a0;color:#7a5a00;}
+  .banner.err{background:var(--danger-soft);border:1px solid #f5c2c7;color:#8b1a25;}
+  .banner.info{background:#eef4ff;border:1px solid #cfe0ff;color:#0a4b9c;}
+  .banner.ok{background:var(--brand-soft);border:1px solid #a8ddc0;color:#005c2f;}
+  .banner b{font-weight:700;}
+
+  /* ============ 表单 ============ */
+  .field{margin-bottom:14px;}
+  .field > label{display:block;font-size:13px;font-weight:600;margin-bottom:6px;}
+  .field > label em{color:var(--danger);font-style:normal;margin-left:2px;}
+  input[type=text],input[type=tel],input[type=email],input[type=password],select{
+    width:100%;height:38px;padding:0 12px;
+    border:1px solid var(--border-strong);border-radius:9px;
+    background:#fff;color:var(--text);font-size:14px;
+    font-family:inherit;outline:none;transition:border-color .15s,box-shadow .15s;
+  }
+  input:focus,select:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,160,80,.13);}
+  input::placeholder{color:#9aa4b2;}
+  input:disabled{background:#f6f8fa;color:var(--muted);cursor:not-allowed;}
+  select{cursor:pointer;appearance:none;
+    background-image:url("data:image/svg+xml;charset=utf8,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath fill='%2357606a' d='M6 8.5 1.5 4h9z'/%3E%3C/svg%3E");
+    background-repeat:no-repeat;background-position:right 12px center;padding-right:32px;}
+  .invalid{border-color:var(--danger) !important;background:var(--danger-soft);}
+  .ok-field{border-color:var(--brand) !important;}
+  .err{font-size:12px;color:var(--danger);margin-top:4px;display:none;}
+  .err.show{display:block;}
+
+  .chips{display:flex;flex-wrap:wrap;gap:7px;}
+  .chip{position:relative;display:inline-block;}
+  .chip input{position:absolute;opacity:0;pointer-events:none;}
+  .chip span{
+    display:inline-block;padding:5px 12px;border-radius:999px;
+    border:1px solid var(--border-strong);background:#fff;
+    font-size:13px;color:var(--muted);cursor:pointer;transition:all .15s;user-select:none;
+  }
+  .chip span:hover{border-color:var(--brand);color:var(--brand-dark);}
+  .chip input:checked + span{background:var(--brand-soft);border-color:var(--brand);color:var(--brand-dark);font-weight:600;}
+
+  .readonly-time{
+    height:38px;line-height:38px;padding:0 12px;border-radius:9px;
+    background:#f6f8fa;border:1px dashed var(--border-strong);
+    font-family:Consolas,Monaco,monospace;font-size:13.5px;color:var(--muted);
+  }
+  .hint{margin:5px 0 0;font-size:12px;color:var(--muted);}
+  .keep-line{display:flex;align-items:center;gap:7px;font-size:12.5px;color:var(--muted);margin:2px 0 16px;cursor:pointer;user-select:none;}
+  .keep-line input{width:14px;height:14px;accent-color:var(--brand);cursor:pointer;}
+
+  .actions{display:flex;gap:10px;}
+  .btn{
+    height:40px;padding:0 20px;border-radius:9px;border:1px solid transparent;
+    font-size:14px;font-family:inherit;font-weight:600;cursor:pointer;
+    transition:all .15s;white-space:nowrap;
+  }
+  .btn:disabled{opacity:.6;cursor:not-allowed;}
+  .btn-primary{background:var(--brand);color:#fff;flex:1;}
+  .btn-primary:hover:not(:disabled){background:var(--brand-dark);}
+  .btn-ghost{background:#fff;color:var(--muted);border-color:var(--border-strong);}
+  .btn-ghost:hover:not(:disabled){color:var(--text);border-color:#9aa4b2;}
+  .btn-block{width:100%;}
+  .btn:active:not(:disabled){transform:translateY(1px);}
+
+  /* ============ 成功回执 ============ */
+  .success-box{text-align:center;padding:30px 16px;}
+  .success-box .tick{
+    width:58px;height:58px;border-radius:50%;background:var(--brand-soft);
+    color:var(--brand);font-size:30px;line-height:58px;margin:0 auto 14px;
+  }
+  .success-box h3{margin:0 0 6px;font-size:16px;}
+  .success-box .time{
+    font-family:Consolas,Monaco,monospace;color:var(--brand-dark);
+    background:var(--brand-soft);display:inline-block;padding:5px 14px;
+    border-radius:8px;margin:10px 0 16px;font-size:13.5px;
+  }
+  .success-box p{color:var(--muted);font-size:13px;margin:0 0 18px;}
+
+  .notes{list-style:none;padding:0;margin:0;}
+  .notes li{position:relative;padding:9px 0 9px 26px;font-size:13px;color:var(--muted);border-bottom:1px dashed var(--border);}
+  .notes li:last-child{border-bottom:none;}
+  .notes li::before{content:"";position:absolute;left:8px;top:16px;width:6px;height:6px;border-radius:50%;background:var(--brand);}
+  .notes li b{color:var(--text);font-weight:600;}
+
+  /* ============ 登录 / 注册 ============ */
+  .auth-wrap{max-width:430px;margin:44px auto;}
+  .auth-tabs{display:flex;gap:4px;background:#f1f4f8;padding:4px;border-radius:10px;margin-bottom:20px;}
+  .auth-tab{
+    flex:1;border:none;background:none;font-family:inherit;font-size:13px;font-weight:600;
+    color:var(--muted);padding:8px 6px;border-radius:7px;cursor:pointer;transition:all .15s;
+  }
+  .auth-tab.active{background:#fff;color:var(--brand-dark);box-shadow:0 1px 3px rgba(16,24,40,.08);}
+  .code-row{display:flex;gap:8px;}
+  .code-row input{flex:1;}
+  .code-btn{
+    height:38px;padding:0 14px;border-radius:9px;border:1px solid var(--brand);
+    background:var(--brand-soft);color:var(--brand-dark);font-family:inherit;
+    font-size:13px;font-weight:600;cursor:pointer;white-space:nowrap;transition:all .15s;
+  }
+  .code-btn:hover:not(:disabled){background:#d9f0e4;}
+  .code-btn:disabled{opacity:.55;cursor:not-allowed;border-color:var(--border-strong);color:var(--muted);background:#f6f8fa;}
+  .auth-msg{font-size:12.5px;margin-top:10px;display:none;}
+  .auth-msg.show{display:block;}
+  .auth-msg.err{color:var(--danger);}
+  .auth-msg.ok{color:var(--brand-dark);}
+  .link-row{text-align:center;margin-top:14px;font-size:12.5px;}
+  .link-row button{background:none;border:none;color:var(--blue);cursor:pointer;font-family:inherit;font-size:12.5px;padding:2px 4px;text-decoration:underline;}
+  .suffix-note{font-size:12px;color:var(--muted);margin-top:5px;}
+  .suffix-note b{color:var(--brand-dark);}
+
+  /* ============ 统计条 ============ */
+  .stats{display:flex;gap:10px;flex-wrap:wrap;margin-bottom:14px;}
+  .stat{flex:1;min-width:104px;background:#f8fafc;border:1px solid var(--border);border-radius:11px;padding:10px 14px;}
+  .stat b{display:block;font-size:20px;font-weight:700;color:var(--brand-dark);line-height:1.25;}
+  .stat span{font-size:12px;color:var(--muted);}
+
+  /* ============ 工具栏 ============ */
+  .toolbar{display:flex;gap:9px;align-items:center;flex-wrap:wrap;padding-bottom:14px;margin-bottom:4px;border-bottom:1px solid var(--border);}
+  .toolbar .search{
+    flex:1;min-width:160px;height:36px;padding:0 12px;border-radius:9px;
+    border:1px solid var(--border-strong);font-size:13.5px;outline:none;font-family:inherit;color:var(--text);
+  }
+  .toolbar .search:focus{border-color:var(--brand);box-shadow:0 0 0 3px rgba(0,160,80,.13);}
+  .tbtn{
+    height:36px;padding:0 14px;border-radius:9px;font-size:13px;font-weight:600;
+    border:1px solid var(--border-strong);background:#fff;color:var(--muted);
+    cursor:pointer;font-family:inherit;transition:all .15s;white-space:nowrap;
+  }
+  .tbtn:hover:not(:disabled){color:var(--text);border-color:#9aa4b2;}
+  .tbtn:disabled{opacity:.55;cursor:not-allowed;}
+  .tbtn.export{background:var(--brand);border-color:var(--brand);color:#fff;}
+  .tbtn.export:hover:not(:disabled){background:var(--brand-dark);border-color:var(--brand-dark);}
+
+  /* ============ 表格 ============ */
+  .table-wrap{max-height:560px;overflow:auto;border-radius:10px;}
+  table{width:100%;border-collapse:separate;border-spacing:0;font-size:13.5px;}
+  thead th{
+    position:sticky;top:0;z-index:2;background:#f6f8fa;color:var(--muted);
+    font-weight:600;font-size:12.5px;text-align:left;padding:10px 12px;
+    white-space:nowrap;border-bottom:1px solid var(--border);
+  }
+  tbody td{padding:10px 12px;border-bottom:1px solid #f0f3f7;vertical-align:middle;}
+  tbody tr:last-child td{border-bottom:none;}
+  tbody tr:hover{background:#fafcfd;}
+  .idx{color:var(--muted);font-family:Consolas,monospace;font-size:12.5px;}
+  .name-strong{font-weight:600;}
+  .mono{font-family:Consolas,Monaco,monospace;}
+  .tag{display:inline-block;padding:1px 9px;border-radius:999px;margin:1px 3px 1px 0;background:var(--brand-soft);color:var(--brand-dark);font-size:12px;}
+  .grade-tag{background:#eef4ff;color:#0969da;}
+  .time-cell{color:var(--muted);font-family:Consolas,monospace;font-size:12.5px;white-space:nowrap;}
+  .row-act{white-space:nowrap;}
+  .link-btn{background:none;border:none;padding:2px 6px;font-size:12.5px;cursor:pointer;font-family:inherit;color:var(--muted);border-radius:6px;transition:all .15s;}
+  .link-btn:hover{background:#f0f3f7;color:var(--text);}
+  .link-btn.del:hover{background:var(--danger-soft);color:var(--danger);}
+  .empty{text-align:center;padding:52px 16px;color:var(--muted);}
+  .empty .big{font-size:34px;opacity:.35;margin-bottom:8px;}
+
+  /* ============ 加载 / 提示 ============ */
+  .spinner{
+    display:inline-block;width:14px;height:14px;margin-right:6px;
+    border:2px solid rgba(255,255,255,.4);border-top-color:#fff;
+    border-radius:50%;animation:spin .7s linear infinite;vertical-align:-2px;
+  }
+  @keyframes spin{to{transform:rotate(360deg);}}
+  .loading-line{text-align:center;color:var(--muted);padding:36px;font-size:13.5px;}
+
+  #toast{position:fixed;right:22px;bottom:22px;z-index:99;display:flex;flex-direction:column;gap:9px;align-items:flex-end;}
+  .toast-item{background:#1f2328;color:#fff;padding:10px 16px;border-radius:10px;font-size:13.5px;box-shadow:0 8px 24px rgba(16,24,40,.22);animation:slideIn .22s ease-out;max-width:340px;}
+  .toast-item.ok{background:#00763b;}
+  .toast-item.warn{background:#bf8700;}
+  .toast-item.err{background:#cf222e;}
+  @keyframes slideIn{from{opacity:0;transform:translateY(8px);}to{opacity:1;transform:none;}}
+
+  .table-wrap::-webkit-scrollbar{width:8px;height:8px;}
+  .table-wrap::-webkit-scrollbar-thumb{background:#d8dee7;border-radius:8px;}
+  .table-wrap::-webkit-scrollbar-thumb:hover{background:#c3ccd8;}
+</style>
+</head>
+<body>
+
+<header class="topbar">
+  <div class="brand">
+    <div class="logo"><img src="logo.png" alt="新东方"></div>
+    <div>
+      <h1>学员转介绍推荐登记</h1>
+      <p>薪酬绩效部门</p>
+    </div>
+  </div>
+
+  <nav class="tabs hidden" id="navTabs">
+    <button class="tab active" data-view="fill">填写推荐</button>
+    <button class="tab hidden" data-view="admin" id="tabAdmin">数据汇总</button>
+  </nav>
+
+  <div class="user-area" id="userArea"></div>
+</header>
+
+<div class="page">
+
+  <!-- ==================== 门禁：未登录 ==================== -->
+  <section id="viewAuth" class="hidden">
+    <div class="auth-wrap">
+      <div class="card">
+        <h2 id="authTitle">登录</h2>
+
+        <div class="auth-tabs">
+          <button class="auth-tab active" data-auth="password">密码登录</button>
+          <button class="auth-tab" data-auth="signup">注册</button>
+          <button class="auth-tab" data-auth="otp">验证码登录</button>
+        </div>
+
+        <form id="authForm" autocomplete="off" novalidate>
+          <div class="field">
+            <label for="authEmail">邮箱</label>
+            <input type="email" id="authEmail" placeholder="you@xdf.cn">
+            <div class="err" id="err-authEmail"></div>
+            <div class="suffix-note hidden" id="suffixNote">
+              仅限 <b>@xdf.cn</b> 邮箱注册
+            </div>
+          </div>
+
+          <div class="field hidden" id="fieldCode">
+            <label for="authCode">邮箱验证码</label>
+            <div class="code-row">
+              <input type="text" id="authCode" placeholder="邮件里的验证码" maxlength="8">
+              <button type="button" class="code-btn" id="sendCodeBtn">获取验证码</button>
+            </div>
+          </div>
+
+          <div class="field" id="fieldPassword">
+            <label for="authPassword">密码</label>
+            <input type="password" id="authPassword" placeholder="输入密码" maxlength="64">
+          </div>
+
+          <button type="submit" class="btn btn-primary btn-block" id="authSubmitBtn">登录</button>
+        </form>
+
+        <div class="auth-msg" id="authMsg"></div>
+
+        <div class="link-row">
+          <button type="button" id="forgotLink">忘记密码？</button>
+        </div>
+
+        <div id="resetPane" class="hidden" style="margin-top:18px;padding-top:18px;border-top:1px solid var(--border);">
+          <div class="field">
+            <label for="resetEmail">注册邮箱</label>
+            <input type="email" id="resetEmail" placeholder="you@xdf.cn">
+          </div>
+          <button type="button" class="btn btn-ghost btn-block" id="sendResetBtn">发送重置验证码</button>
+          <div class="field" style="margin-top:14px;">
+            <label for="resetCode">重置验证码</label>
+            <input type="text" id="resetCode" placeholder="邮件里的验证码" maxlength="8">
+          </div>
+          <div class="field">
+            <label for="resetPassword">新密码</label>
+            <input type="password" id="resetPassword" placeholder="至少 6 位" maxlength="64">
+          </div>
+          <button type="button" class="btn btn-primary btn-block" id="doResetBtn">重置密码</button>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 填写 ==================== -->
+  <section id="viewFill" class="hidden">
+    <div class="grid">
+      <div class="card">
+        <h2>填写推荐信息</h2>
+        <form id="refForm" autocomplete="off" novalidate>
+
+          <div class="field">
+            <label for="referrerName">推荐人姓名 <em>*</em></label>
+            <input type="text" id="referrerName" maxlength="20" placeholder="请输入推荐人姓名">
+            <div class="err" id="err-referrerName"></div>
+          </div>
+
+          <div class="field">
+            <label for="referrerPhone">推荐人电话 <em>*</em></label>
+            <input type="tel" id="referrerPhone" maxlength="20" placeholder="手机号或固话，如 13800138000">
+            <div class="err" id="err-referrerPhone"></div>
+          </div>
+
+          <div class="field">
+            <label for="studentName">推荐学员姓名 <em>*</em></label>
+            <input type="text" id="studentName" maxlength="20" placeholder="请输入被推荐学员姓名">
+            <div class="err" id="err-studentName"></div>
+          </div>
+
+          <div class="field">
+            <label for="grade">推荐学员年级 <em>*</em></label>
+            <select id="grade"><option value="">请选择年级</option></select>
+            <div class="err" id="err-grade"></div>
+          </div>
+
+          <div class="field">
+            <label>推荐学员科目 <em>*</em>（可多选）</label>
+            <div class="chips" id="subjectChips"></div>
+            <div class="err" id="err-subjects"></div>
+          </div>
+
+          <div class="field">
+            <label for="submitter">填写人</label>
+            <input type="text" id="submitter" maxlength="20" placeholder="默认取登录邮箱，可修改">
+          </div>
+
+          <div class="field">
+            <label for="note">备注</label>
+            <input type="text" id="note" maxlength="50" placeholder="选填，如：意向班型 / 联系时段">
+          </div>
+
+          <div class="field">
+            <label>推荐时间</label>
+            <div class="readonly-time" id="submitTimePreview">--</div>
+            <p class="hint">提交时自动记录，无需手动填写</p>
+          </div>
+
+          <label class="keep-line">
+            <input type="checkbox" id="keepReferrer">
+            提交后保留推荐人信息（同一人多单时连续录入）
+          </label>
+
+          <div class="actions">
+            <button type="submit" class="btn btn-primary" id="submitBtn">提交推荐</button>
+            <button type="button" class="btn btn-ghost" id="resetBtn">重置</button>
+          </div>
+        </form>
+      </div>
+
+      <div class="card">
+        <div id="successPane" class="hidden">
+          <div class="success-box">
+            <div class="tick">&#10003;</div>
+            <h3>推荐已提交</h3>
+            <p>信息已实时汇入学校后台</p>
+            <div class="time" id="successTime">--</div>
+            <div class="actions">
+              <button class="btn btn-primary" id="againBtn">再录一条</button>
+            </div>
+          </div>
+        </div>
+
+        <div id="noticePane">
+          <h2>填写须知</h2>
+          <ul class="notes">
+            <li><b>登录后填写</b><br>每位老师用本人邮箱账号登录，方便后台核对来源。</li>
+            <li><b>推荐时间自动生成</b><br>以点击"提交推荐"的时间为准，精确到秒。</li>
+            <li><b>一对一登记</b><br>一位推荐人推荐多名学员，请分多次提交。</li>
+            <li><b>科目可多选</b><br>学员报读多科时，把科目都勾上。</li>
+            <li><b>电话请填准确</b><br>手机号或固话均可，后续回访要用。</li>
+          </ul>
+          <div class="banner info" style="margin:16px 0 0;">
+            <div><b>提示：</b>本页信息涉及家长联系方式，请勿对外转发或截图外传。</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- ==================== 汇总（仅管理员） ==================== -->
+  <section id="viewAdmin" class="hidden">
+    <div class="card">
+      <h2>推荐信息汇总</h2>
+
+      <div class="stats">
+        <div class="stat"><b id="statTotal">0</b><span>累计推荐</span></div>
+        <div class="stat"><b id="statToday">0</b><span>今日新增</span></div>
+        <div class="stat"><b id="statWeek">0</b><span>近 7 天</span></div>
+        <div class="stat"><b id="statStudents">0</b><span>涉及学员</span></div>
+        <div class="stat"><b id="statReferrers">0</b><span>推荐人数</span></div>
+        <div class="stat"><b id="statMembers">0</b><span>参与老师</span></div>
+      </div>
+
+      <div class="toolbar">
+        <input type="text" class="search" id="searchBox" placeholder="搜索姓名 / 电话 / 学员 / 科目 / 邮箱">
+        <button class="tbtn export" id="exportXlsx">导出 Excel</button>
+        <button class="tbtn" id="exportCsv">导出 CSV</button>
+        <button class="tbtn" id="refreshBtn">刷新</button>
+      </div>
+
+      <div class="table-wrap">
+        <table>
+          <thead>
+            <tr>
+              <th style="width:46px">序号</th>
+              <th style="width:88px">推荐人</th>
+              <th style="width:124px">电话</th>
+              <th style="width:90px">学员姓名</th>
+              <th style="width:80px">年级</th>
+              <th>科目</th>
+              <th style="width:80px">填写人</th>
+              <th style="width:170px">提交账号</th>
+              <th style="width:148px">推荐时间</th>
+              <th style="width:66px">操作</th>
+            </tr>
+          </thead>
+          <tbody id="tbody"></tbody>
+        </table>
+      </div>
+    </div>
+  </section>
+
+</div>
+
+<div id="toast"></div>
+
+<script src="https://cdn.jsdelivr.net/npm/@tencent-ai/workbuddy-cloud-sdk@dev/lib/index.global.js"></script>
+<script>
+/* =====================================================================
+ * 0. 云服务配置（endpoint / publishableKey 由云服务环境下发，唯一合法来源）
+ * ===================================================================== */
+var PUBLIC_CONFIG = {
+  endpoint: 'https://xdf-referral.app.workbuddy.host',
+  publishableKey: 'wbpk_HklEqf4Nchba8yVgJdgJTY_e6PmfDQIVJ23pD6tTfHMvQa4cM0rFkJK'
+};
+
+var TABLE = 'referrals';        // 推荐记录表
+var ADMIN_TABLE = 'app_admins'; // 管理员白名单表
+
+// 注册邮箱后缀限制。数据库端的 RLS 策略同样写死了 '%@xdf.cn'，
+// 改这里只改前端提示；要真正放开必须同时改策略。
+var ALLOWED_DOMAIN = 'xdf.cn';
+
+var cloud = null;
+var sdkReady = false;
+
+var state = {
+  session: null,    // 当前会话，未登录为 null
+  isAdmin: false,   // 是否管理员（决定能否看汇总）
+  records: [],      // 云端拉取的记录（仅管理员持有）
+  view: 'auth'      // auth | fill | admin
+};
+
+var pendingEmailOtp = null;  // 验证码挑战（登录/注册共用）
+var pendingReset = null;     // 重置密码挑战
+
+/* =====================================================================
+ * 1. 基础工具
+ * ===================================================================== */
+function $(id) { return document.getElementById(id); }
+function pad2(n) { return n < 10 ? '0' + n : '' + n; }
+
+function fmtDateTime(input) {
+  var d = (input instanceof Date) ? input : new Date(input);
+  if (!d || isNaN(d.getTime())) return '';
+  return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate())
+       + ' ' + pad2(d.getHours()) + ':' + pad2(d.getMinutes()) + ':' + pad2(d.getSeconds());
+}
+
+function fmtDate(d) { return d.getFullYear() + '-' + pad2(d.getMonth() + 1) + '-' + pad2(d.getDate()); }
+
+function escapeHtml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#39;' }[c];
+  });
+}
+
+function escapeXml(str) {
+  return String(str == null ? '' : str).replace(/[&<>"']/g, function (c) {
+    return { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&apos;' }[c];
+  });
+}
+
+function toast(msg, type) {
+  var box = $('toast');
+  var item = document.createElement('div');
+  item.className = 'toast-item ' + (type || '');
+  item.textContent = msg;
+  box.appendChild(item);
+  setTimeout(function () {
+    item.style.transition = 'opacity .3s, transform .3s';
+    item.style.opacity = '0';
+    item.style.transform = 'translateY(6px)';
+    setTimeout(function () { item.remove(); }, 320);
+  }, 2600);
+}
+
+function downloadBlob(blob, filename) {
+  var url = URL.createObjectURL(blob);
+  var a = document.createElement('a');
+  a.href = url; a.download = filename;
+  document.body.appendChild(a); a.click(); document.body.removeChild(a);
+  setTimeout(function () { URL.revokeObjectURL(url); }, 3000);
+}
+
+function readableError(error) {
+  if (!error) return '未知错误';
+  if (error.code === '42501') return '当前账号没有权限执行该操作（请确认使用 @xdf.cn 邮箱登录，或联系管理员开通）';
+  if (error.code === '23502') return '提交缺少必要信息，请退出后重新登录再试';
+  if (error.code === '42P01') return '数据表不存在，请联系管理员初始化';
+  if (error.code === '23505') return '这条记录已存在，请勿重复提交';
+  return error.message || String(error);
+}
+
+function isAllowedEmail(email) {
+  var m = /^[^\s@]+@([^\s@]+)$/.exec(String(email || '').trim());
+  return !!m && m[1].toLowerCase() === ALLOWED_DOMAIN;
+}
+
+// 从会话里取邮箱（多路兜底，兼容不同字段命名）
+function getSessionEmail() {
+  var s = state.session;
+  if (!s || !s.user) return '';
+  var u = s.user;
+  return u.email || u.email_address || (u.user_metadata && u.user_metadata.email) || '';
+}
+
+/* =====================================================================
+ * 2. SDK 初始化
+ * ===================================================================== */
+function initCloud() {
+  if (typeof WorkBuddyCloud === 'undefined') { sdkReady = false; return false; }
+  cloud = WorkBuddyCloud.createWorkBuddyCloud({
+    endpoint: PUBLIC_CONFIG.endpoint,
+    publishableKey: PUBLIC_CONFIG.publishableKey
+  });
+  sdkReady = true;
+  return true;
+}
+
+/* =====================================================================
+ * 3. 静态选项渲染
+ * ===================================================================== */
+var GRADE_OPTIONS = ['幼儿园','一年级','二年级','三年级','四年级','五年级','六年级',
+                     '初一','初二','初三','高一','高二','高三','成人','其他'];
+
+var SUBJECT_OPTIONS = ['语文','数学','英语','物理','化学','生物','政治','历史','地理',
+                       '科学','编程','美术','书法','口才','雅思','托福','其他'];
+
+(function initGradeOptions() {
+  var frag = document.createDocumentFragment();
+  GRADE_OPTIONS.forEach(function (g) {
+    var opt = document.createElement('option');
+    opt.value = g; opt.textContent = g;
+    frag.appendChild(opt);
+  });
+  $('grade').appendChild(frag);
+})();
+
+(function initSubjectChips() {
+  var frag = document.createDocumentFragment();
+  SUBJECT_OPTIONS.forEach(function (s) {
+    var label = document.createElement('label');
+    label.className = 'chip';
+    label.innerHTML = '<input type="checkbox" value="' + s + '"><span>' + s + '</span>';
+    frag.appendChild(label);
+  });
+  $('subjectChips').appendChild(frag);
+})();
+
+/* =====================================================================
+ * 4. 视图与顶部栏
+ * ===================================================================== */
+function applyView() {
+  $('viewAuth').classList.toggle('hidden', state.view !== 'auth');
+  $('viewFill').classList.toggle('hidden', state.view !== 'fill');
+  $('viewAdmin').classList.toggle('hidden', state.view !== 'admin');
+
+  var loggedIn = !!state.session;
+  $('navTabs').classList.toggle('hidden', !loggedIn);
+  $('tabAdmin').classList.toggle('hidden', !state.isAdmin);
+
+  document.querySelectorAll('.tab').forEach(function (t) {
+    t.classList.toggle('active', t.getAttribute('data-view') === state.view);
+  });
+}
+
+function renderUserArea() {
+  var area = $('userArea');
+
+  if (!state.session) { area.innerHTML = ''; return; }
+
+  var email = getSessionEmail() || '已登录';
+  var badge = state.isAdmin ? '<span class="role-badge">管理员</span>' : '';
+
+  area.innerHTML = badge
+    + '<span class="user-chip" title="' + escapeHtml(email) + '">' + escapeHtml(email) + '</span>'
+    + '<button class="user-btn" id="logoutBtn">退出</button>';
+
+  $('logoutBtn').addEventListener('click', doLogout);
+}
+
+// 统一刷新：登录态 → 角色 → 视图
+async function refreshState() {
+  var session = null;
+  if (sdkReady) {
+    try {
+      var r = await cloud.auth.getSession();
+      session = (!r.error && r.data) ? r.data : null;
+    } catch (e) { session = null; }
+  }
+
+  state.session = session;
+  state.isAdmin = session ? await checkIsAdmin() : false;
+
+  if (!session) {
+    state.view = 'auth';
+    state.records = [];
+  } else if (state.view === 'admin' && !state.isAdmin) {
+    state.view = 'fill';
+  } else if (state.view === 'auth') {
+    state.view = 'fill';
+  }
+
+  renderUserArea();
+  applyView();
+
+  if (state.view === 'fill') prefillSubmitter();
+  if (state.view === 'admin') loadRecords();
+}
+
+// 管理员判定：RLS 只允许查到自己的那一条，
+// 所以"查到 1 条"就等于"我在白名单里"
+async function checkIsAdmin() {
+  try {
+    var r = await cloud.database.from(ADMIN_TABLE).select('uid');
+    if (r.error) return false;
+    return Array.isArray(r.data) && r.data.length > 0;
+  } catch (e) {
+    return false;
+  }
+}
+
+// 填写人默认取邮箱 @ 前面的部分
+function prefillSubmitter() {
+  var el = $('submitter');
+  if (el.value.trim()) return;
+  var email = getSessionEmail();
+  if (email && email.indexOf('@') > 0) el.value = email.split('@')[0];
+}
+
+document.querySelectorAll('.tab').forEach(function (t) {
+  t.addEventListener('click', function () {
+    var target = t.getAttribute('data-view');
+    if (target === 'admin' && !state.isAdmin) return;
+    state.view = target;
+    applyView();
+    if (target === 'admin') loadRecords();
+  });
+});
+
+async function doLogout() {
+  try { await cloud.auth.signOut(); } catch (e) { /* 忽略 */ }
+  state.session = null;
+  state.isAdmin = false;
+  state.records = [];
+  state.view = 'auth';
+  resetAuthForm();
+  renderUserArea();
+  applyView();
+  toast('已退出登录', 'ok');
+}
+
+/* =====================================================================
+ * 5. 登录 / 注册 / 找回密码
+ * ===================================================================== */
+var authMode = 'password';  // password | signup | otp
+
+function setAuthMode(mode) {
+  authMode = mode;
+
+  document.querySelectorAll('.auth-tab').forEach(function (t) {
+    t.classList.toggle('active', t.getAttribute('data-auth') === mode);
+  });
+
+  var needCode = (mode === 'signup' || mode === 'otp');
+  $('fieldCode').classList.toggle('hidden', !needCode);
+  $('fieldPassword').classList.toggle('hidden', mode === 'otp');
+
+  $('authSubmitBtn').textContent = (mode === 'signup') ? '注册并登录' : '登录';
+  $('authPassword').placeholder = (mode === 'signup') ? '设置登录密码（至少 6 位）' : '输入密码';
+  $('authTitle').textContent = (mode === 'signup') ? '注册账号' : '登录';
+  $('suffixNote').classList.toggle('hidden', mode !== 'signup');
+
+  // 切换模式后旧验证码作废
+  pendingEmailOtp = null;
+  $('authCode').value = '';
+  clearAuthError();
+  showAuthMsg('');
+}
+
+function showAuthMsg(msg, kind) {
+  var box = $('authMsg');
+  box.textContent = msg || '';
+  box.className = 'auth-msg' + (msg ? ' show ' + (kind || '') : '');
+}
+
+function clearAuthError() {
+  var box = $('err-authEmail');
+  box.textContent = '';
+  box.classList.remove('show');
+  $('authEmail').classList.remove('invalid', 'ok-field');
+}
+
+function resetAuthForm() {
+  $('authForm').reset();
+  pendingEmailOtp = null;
+  pendingReset = null;
+  setAuthMode('password');
+  $('resetPane').classList.add('hidden');
+}
+
+document.querySelectorAll('.auth-tab').forEach(function (t) {
+  t.addEventListener('click', function () { setAuthMode(t.getAttribute('data-auth')); });
+});
+
+// 邮箱实时校验（仅注册模式拦截）
+$('authEmail').addEventListener('input', function () {
+  var v = $('authEmail').value.trim();
+  var box = $('err-authEmail');
+
+  if (!v) {
+    box.classList.remove('show');
+    $('authEmail').classList.remove('invalid', 'ok-field');
+    return;
+  }
+
+  if (authMode === 'signup') {
+    if (isAllowedEmail(v)) {
+      box.classList.remove('show');
+      $('authEmail').classList.remove('invalid');
+      $('authEmail').classList.add('ok-field');
+    } else {
+      box.textContent = '注册仅支持 @' + ALLOWED_DOMAIN + ' 邮箱';
+      box.classList.add('show');
+      $('authEmail').classList.add('invalid');
+      $('authEmail').classList.remove('ok-field');
+    }
+  } else {
+    box.classList.remove('show');
+    $('authEmail').classList.remove('invalid', 'ok-field');
+  }
+});
+
+$('forgotLink').addEventListener('click', function () {
+  var pane = $('resetPane');
+  pane.classList.toggle('hidden');
+  if (!pane.classList.contains('hidden')) $('resetEmail').value = $('authEmail').value.trim();
+});
+
+// —— 获取邮箱验证码 ——
+$('sendCodeBtn').addEventListener('click', async function () {
+  var email = $('authEmail').value.trim();
+  if (!email) { showAuthMsg('请先填写邮箱', 'err'); return; }
+
+  // 注册模式下非 @xdf.cn 直接拦下，不发信
+  if (authMode === 'signup' && !isAllowedEmail(email)) {
+    showAuthMsg('注册仅支持 @' + ALLOWED_DOMAIN + ' 邮箱', 'err');
+    return;
+  }
+
+  var btn = $('sendCodeBtn');
+  btn.disabled = true;
+  btn.textContent = '发送中…';
+
+  try {
+    var sent = await cloud.auth.sendOtp({ email: email });
+    if (sent.error) {
+      showAuthMsg(sent.error.message || '验证码发送失败', 'err');
+      btn.disabled = false;
+      btn.textContent = '获取验证码';
+      return;
+    }
+
+    // 保存本次挑战，提交时复用，不再重新发信
+    pendingEmailOtp = {
+      email: email,
+      verificationId: sent.data.verificationId,
+      isExistingUser: sent.data.isExistingUser
+    };
+    showAuthMsg('验证码已发送，请查收邮箱', 'ok');
+
+    var left = 60;
+    btn.textContent = left + ' 秒后重发';
+    var timer = setInterval(function () {
+      left--;
+      if (left <= 0) {
+        clearInterval(timer);
+        btn.disabled = false;
+        btn.textContent = '重新获取';
+      } else {
+        btn.textContent = left + ' 秒后重发';
+      }
+    }, 1000);
+  } catch (err) {
+    showAuthMsg('验证码发送失败：' + (err && err.message ? err.message : '网络异常'), 'err');
+    btn.disabled = false;
+    btn.textContent = '获取验证码';
+  }
+});
+
+// —— 登录 / 注册提交 ——
+$('authForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+  if (!sdkReady) { showAuthMsg('云端服务未就绪，请刷新页面', 'err'); return; }
+
+  var email = $('authEmail').value.trim();
+  if (!email) { showAuthMsg('请填写邮箱', 'err'); return; }
+
+  // 注册模式的邮箱后缀硬校验
+  if (authMode === 'signup' && !isAllowedEmail(email)) {
+    showAuthMsg('注册仅支持 @' + ALLOWED_DOMAIN + ' 邮箱', 'err');
+    $('authEmail').classList.add('invalid');
+    return;
+  }
+
+  var btn = $('authSubmitBtn');
+  var originalText = btn.textContent;
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>处理中';
+
+  try {
+    var result;
+
+    if (authMode === 'password') {
+      var pwd = $('authPassword').value;
+      if (!pwd) { showAuthMsg('请填写密码', 'err'); return; }
+      result = await cloud.auth.signInWithPassword({ email: email, password: pwd });
+
+    } else {
+      var code = $('authCode').value.trim();
+      if (!pendingEmailOtp || pendingEmailOtp.email !== email) {
+        showAuthMsg('请先点击"获取验证码"', 'err');
+        return;
+      }
+      if (!code) { showAuthMsg('请填写邮箱验证码', 'err'); return; }
+
+      var pwdForSignup = undefined;
+      if (authMode === 'signup' && !pendingEmailOtp.isExistingUser) {
+        pwdForSignup = $('authPassword').value;
+        if (!pwdForSignup || pwdForSignup.length < 6) {
+          showAuthMsg('新账号请设置至少 6 位密码', 'err');
+          return;
+        }
+      }
+
+      result = await cloud.auth.verifyOtp({
+        email: pendingEmailOtp.email,
+        verificationId: pendingEmailOtp.verificationId,
+        isExistingUser: pendingEmailOtp.isExistingUser,
+        token: code,
+        password: pwdForSignup
+      });
+    }
+
+    if (result.error) {
+      showAuthMsg(result.error.message || '操作失败，请检查信息后重试', 'err');
+      return;
+    }
+
+    pendingEmailOtp = null;
+    state.view = 'fill';
+    await refreshState();
+    toast('登录成功', 'ok');
+
+  } catch (err) {
+    showAuthMsg('操作失败：' + (err && err.message ? err.message : '网络异常，请重试'), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = originalText;
+  }
+});
+
+// —— 忘记密码 ——
+$('sendResetBtn').addEventListener('click', async function () {
+  var email = $('resetEmail').value.trim();
+  if (!email) { toast('请填写注册邮箱', 'warn'); return; }
+
+  var btn = $('sendResetBtn');
+  btn.disabled = true;
+  btn.textContent = '发送中…';
+
+  try {
+    var started = await cloud.auth.resetPasswordForEmail(email);
+    if (started.error) {
+      toast('发送失败：' + started.error.message, 'err');
+      btn.disabled = false;
+      btn.textContent = '发送重置验证码';
+      return;
+    }
+    pendingReset = started.data;   // 保存挑战，下一步复用，避免重复发信
+    toast('重置验证码已发送到邮箱', 'ok');
+    btn.disabled = false;
+    btn.textContent = '重新发送';
+  } catch (err) {
+    toast('发送失败：' + (err && err.message ? err.message : '网络异常'), 'err');
+    btn.disabled = false;
+    btn.textContent = '发送重置验证码';
+  }
+});
+
+$('doResetBtn').addEventListener('click', async function () {
+  var email = $('resetEmail').value.trim();
+  var code = $('resetCode').value.trim();
+  var newPwd = $('resetPassword').value;
+
+  if (!email) { toast('请填写注册邮箱', 'warn'); return; }
+  if (!pendingReset) { toast('请先点击"发送重置验证码"', 'warn'); return; }
+  if (!code) { toast('请填写重置验证码', 'warn'); return; }
+  if (!newPwd || newPwd.length < 6) { toast('新密码至少 6 位', 'warn'); return; }
+
+  var btn = $('doResetBtn');
+  btn.disabled = true;
+  btn.textContent = '重置中…';
+
+  try {
+    var completed = await pendingReset.updateUser({ nonce: code, password: newPwd });
+    if (completed.error) {
+      toast('重置失败：' + completed.error.message, 'err');
+      return;
+    }
+    pendingReset = null;
+    $('resetPane').classList.add('hidden');
+    toast('密码已重置，正在登录', 'ok');
+    state.view = 'fill';
+    await refreshState();
+  } catch (err) {
+    toast('重置失败：' + (err && err.message ? err.message : '验证码错误或已过期'), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '重置密码';
+  }
+});
+
+/* =====================================================================
+ * 6. 提交推荐（必须已登录）
+ * ===================================================================== */
+function getCheckedSubjects() {
+  var arr = [];
+  document.querySelectorAll('#subjectChips input[type=checkbox]').forEach(function (cb) {
+    if (cb.checked) arr.push(cb.value);
+  });
+  return arr;
+}
+
+function showError(key, msg) {
+  var box = $('err-' + key);
+  if (!box) return;
+  box.textContent = msg;
+  box.classList.add('show');
+}
+
+function clearErrors() {
+  ['referrerName','referrerPhone','studentName','grade','subjects'].forEach(function (k) {
+    var box = $('err-' + k);
+    if (box) { box.textContent = ''; box.classList.remove('show'); }
+  });
+  ['referrerName','referrerPhone','studentName','grade'].forEach(function (k) {
+    $(k).classList.remove('invalid');
+  });
+}
+
+function isValidPhone(v) {
+  return /^1[3-9]\d{9}$/.test(v) || /^(0\d{2,3}-?)?\d{7,8}$/.test(v);
+}
+
+function validateForm() {
+  clearErrors();
+  var values = {}, ok = true;
+
+  values.referrerName = $('referrerName').value.trim();
+  if (!values.referrerName) {
+    showError('referrerName', '请填写推荐人姓名');
+    $('referrerName').classList.add('invalid'); ok = false;
+  }
+
+  values.referrerPhone = $('referrerPhone').value.trim();
+  if (!values.referrerPhone) {
+    showError('referrerPhone', '请填写推荐人电话');
+    $('referrerPhone').classList.add('invalid'); ok = false;
+  } else if (!isValidPhone(values.referrerPhone)) {
+    showError('referrerPhone', '电话格式不正确，请填写 11 位手机号或固话');
+    $('referrerPhone').classList.add('invalid'); ok = false;
+  }
+
+  values.studentName = $('studentName').value.trim();
+  if (!values.studentName) {
+    showError('studentName', '请填写推荐学员姓名');
+    $('studentName').classList.add('invalid'); ok = false;
+  }
+
+  values.grade = $('grade').value;
+  if (!values.grade) {
+    showError('grade', '请选择推荐学员年级');
+    $('grade').classList.add('invalid'); ok = false;
+  }
+
+  values.subjects = getCheckedSubjects();
+  if (values.subjects.length === 0) {
+    showError('subjects', '请至少选择一个科目'); ok = false;
+  }
+
+  values.submitter = $('submitter').value.trim();
+  values.note = $('note').value.trim();
+
+  return { ok: ok, values: values };
+}
+
+function resetRefForm(keepReferrer) {
+  var lastName = keepReferrer ? $('referrerName').value : '';
+  var lastPhone = keepReferrer ? $('referrerPhone').value : '';
+  var lastSubmitter = $('submitter').value;
+
+  $('refForm').reset();
+  $('referrerName').value = lastName;
+  $('referrerPhone').value = lastPhone;
+  $('submitter').value = lastSubmitter;
+  clearErrors();
+}
+
+$('refForm').addEventListener('submit', async function (e) {
+  e.preventDefault();
+
+  if (!sdkReady) { toast('云端服务未就绪，请刷新页面重试', 'err'); return; }
+
+  // 未登录不允许提交（数据库端同样会拦，这里只是给个友好提示）
+  if (!state.session) {
+    toast('请先登录再提交', 'warn');
+    state.view = 'auth';
+    applyView();
+    return;
+  }
+
+  var res = validateForm();
+  if (!res.ok) { toast('还有必填项没填完整', 'warn'); return; }
+
+  var v = res.values;
+  var btn = $('submitBtn');
+  btn.disabled = true;
+  btn.innerHTML = '<span class="spinner"></span>提交中';
+
+  var submitMoment = new Date();
+  var ownerEmail = getSessionEmail();
+
+  try {
+    // owner_id 不传：数据库用 DEFAULT auth.uid() 自动填充，
+    // 同时由 RLS 校验"必须登录 + 邮箱为 @xdf.cn"
+    var payload = {
+      referrer_name: v.referrerName,
+      referrer_phone: v.referrerPhone,
+      student_name: v.studentName,
+      grade: v.grade,
+      subjects: v.subjects.join('、'),
+      note: v.note || null,
+      submitter: v.submitter || null,
+      owner_email: ownerEmail || null
+    };
+
+    var result = await cloud.database.from(TABLE).insert(payload).select();
+
+    if (result.error) {
+      toast('提交失败：' + readableError(result.error), 'err');
+      return;
+    }
+    if (!result.data || result.data.length === 0) {
+      toast('提交失败：权限校验未通过，请联系管理员', 'err');
+      return;
+    }
+
+    toast('提交成功，已汇入后台', 'ok');
+    resetRefForm($('keepReferrer').checked);
+    $('noticePane').classList.add('hidden');
+    $('successPane').classList.remove('hidden');
+    $('successTime').textContent = fmtDateTime(submitMoment);
+
+    if (state.view === 'admin') loadRecords();   // 管理员顺手刷新汇总
+  } catch (err) {
+    toast('提交失败：' + (err && err.message ? err.message : '网络异常，请重试'), 'err');
+  } finally {
+    btn.disabled = false;
+    btn.textContent = '提交推荐';
+  }
+});
+
+$('resetBtn').addEventListener('click', function () {
+  resetRefForm(false);
+  $('successPane').classList.add('hidden');
+  $('noticePane').classList.remove('hidden');
+});
+
+$('againBtn').addEventListener('click', function () {
+  $('successPane').classList.add('hidden');
+  $('noticePane').classList.remove('hidden');
+  $('referrerName').focus();
+});
+
+/* =====================================================================
+ * 7. 汇总（仅管理员）
+ * ===================================================================== */
+async function loadRecords() {
+  if (!state.isAdmin) return;
+
+  var tbody = $('tbody');
+  tbody.innerHTML = '<tr><td colspan="10" class="loading-line">正在读取云端数据…</td></tr>';
+
+  try {
+    var result = await cloud.database
+      .from(TABLE)
+      .select('*')
+      .order('recommended_at', { ascending: false })
+      .limit(1000);
+
+    if (result.error) {
+      tbody.innerHTML = '<tr><td colspan="10" class="empty">读取失败：'
+        + escapeHtml(readableError(result.error)) + '</td></tr>';
+      return;
+    }
+
+    state.records = result.data || [];
+    renderTable();
+  } catch (err) {
+    tbody.innerHTML = '<tr><td colspan="10" class="empty">读取失败：'
+      + escapeHtml(err && err.message ? err.message : '网络异常') + '</td></tr>';
+  }
+}
+
+function getFiltered() {
+  var kw = $('searchBox').value.trim().toLowerCase();
+  if (!kw) return state.records;
+  return state.records.filter(function (r) {
+    var hay = [r.referrer_name, r.referrer_phone, r.student_name, r.grade,
+               r.subjects, r.submitter, r.owner_email, r.note].join(' ').toLowerCase();
+    return hay.indexOf(kw) > -1;
+  });
+}
+
+function renderTable() {
+  var list = getFiltered();
+  var html = '';
+
+  if (list.length === 0) {
+    html = '<tr><td colspan="10" class="empty"><div class="big">&#128203;</div>'
+         + (state.records.length === 0 ? '还没有任何推荐记录' : '没有匹配的记录')
+         + '</td></tr>';
+  } else {
+    list.forEach(function (r, i) {
+      var tags = String(r.subjects || '').split('、').filter(Boolean).map(function (s) {
+        return '<span class="tag">' + escapeHtml(s) + '</span>';
+      }).join('');
+      html += '<tr>'
+        + '<td class="idx">' + (i + 1) + '</td>'
+        + '<td class="name-strong">' + escapeHtml(r.referrer_name) + '</td>'
+        + '<td class="mono">' + escapeHtml(r.referrer_phone) + '</td>'
+        + '<td>' + escapeHtml(r.student_name) + '</td>'
+        + '<td><span class="tag grade-tag">' + escapeHtml(r.grade) + '</span></td>'
+        + '<td>' + tags + '</td>'
+        + '<td>' + escapeHtml(r.submitter || '—') + '</td>'
+        + '<td class="mono" style="font-size:12.5px">' + escapeHtml(r.owner_email || '—') + '</td>'
+        + '<td class="time-cell">' + escapeHtml(fmtDateTime(r.recommended_at)) + '</td>'
+        + '<td class="row-act"><button class="link-btn del" data-del="' + r.id + '">删除</button></td>'
+        + '</tr>';
+    });
+  }
+  $('tbody').innerHTML = html;
+  renderStats();
+}
+
+function renderStats() {
+  var now = new Date();
+  var today = fmtDate(now);
+  var weekAgo = new Date(now.getTime() - 6 * 24 * 3600 * 1000);
+  weekAgo.setHours(0, 0, 0, 0);
+
+  var todayCount = 0, weekCount = 0;
+  var studentSet = {}, referrerSet = {}, memberSet = {};
+
+  state.records.forEach(function (r) {
+    var d = new Date(r.recommended_at);
+    if (!isNaN(d.getTime())) {
+      if (fmtDate(d) === today) todayCount++;
+      if (d >= weekAgo) weekCount++;
+    }
+    studentSet[String(r.student_name) + '|' + String(r.grade)] = 1;
+    referrerSet[String(r.referrer_phone)] = 1;
+    if (r.owner_email) memberSet[r.owner_email] = 1;
+  });
+
+  $('statTotal').textContent     = state.records.length;
+  $('statToday').textContent     = todayCount;
+  $('statWeek').textContent      = weekCount;
+  $('statStudents').textContent  = Object.keys(studentSet).length;
+  $('statReferrers').textContent = Object.keys(referrerSet).length;
+  $('statMembers').textContent   = Object.keys(memberSet).length;
+}
+
+$('searchBox').addEventListener('input', renderTable);
+
+$('refreshBtn').addEventListener('click', async function () {
+  var btn = $('refreshBtn');
+  btn.disabled = true;
+  btn.textContent = '刷新中…';
+  await loadRecords();
+  btn.disabled = false;
+  btn.textContent = '刷新';
+  toast('已刷新', 'ok');
+});
+
+$('tbody').addEventListener('click', async function (e) {
+  var btn = e.target.closest('button[data-del]');
+  if (!btn) return;
+
+  var id = btn.getAttribute('data-del');
+  var rec = state.records.find(function (r) { return String(r.id) === String(id); });
+  if (!rec) return;
+
+  if (!confirm('确认删除【' + rec.student_name + '】这条推荐记录吗？删除后无法恢复。')) return;
+
+  btn.disabled = true;
+  try {
+    var result = await cloud.database.from(TABLE).delete().eq('id', rec.id).select();
+    if (result.error) { toast('删除失败：' + readableError(result.error), 'err'); return; }
+    if (!result.data || result.data.length === 0) {
+      toast('删除失败：没有权限或记录已不存在', 'err');
+      return;
+    }
+    toast('已删除', 'ok');
+    await loadRecords();
+  } catch (err) {
+    toast('删除失败：' + (err && err.message ? err.message : '网络异常'), 'err');
+  } finally {
+    btn.disabled = false;
+  }
+});
+
+/* =====================================================================
+ * 8. 导出 Excel（纯 JS 生成 xlsx，无外部依赖）
+ * ===================================================================== */
+var CRC_TABLE = (function () {
+  var t = new Uint32Array(256);
+  for (var n = 0; n < 256; n++) {
+    var c = n;
+    for (var k = 0; k < 8; k++) c = (c & 1) ? (0xEDB88320 ^ (c >>> 1)) : (c >>> 1);
+    t[n] = c >>> 0;
+  }
+  return t;
+})();
+
+function crc32(u8) {
+  var c = 0xFFFFFFFF;
+  for (var i = 0; i < u8.length; i++) c = CRC_TABLE[(c ^ u8[i]) & 0xFF] ^ (c >>> 8);
+  return (c ^ 0xFFFFFFFF) >>> 0;
+}
+
+function makeZip(files) {
+  var enc = new TextEncoder();
+  var chunks = [], central = [], offset = 0;
+  var now = new Date();
+  var dosTime = ((now.getHours() << 11) | (now.getMinutes() << 5) | (now.getSeconds() >> 1)) & 0xFFFF;
+  var dosDate = (((now.getFullYear() - 1980) << 9) | ((now.getMonth() + 1) << 5) | now.getDate()) & 0xFFFF;
+
+  files.forEach(function (f) {
+    var nameBytes = enc.encode(f.name);
+    var data = (typeof f.data === 'string') ? enc.encode(f.data) : f.data;
+    var crc = crc32(data);
+
+    var lh = new Uint8Array(30 + nameBytes.length);
+    var d1 = new DataView(lh.buffer);
+    d1.setUint32(0, 0x04034b50, true);
+    d1.setUint16(4, 20, true);
+    d1.setUint16(6, 0x0800, true);
+    d1.setUint16(8, 0, true);
+    d1.setUint16(10, dosTime, true);
+    d1.setUint16(12, dosDate, true);
+    d1.setUint32(14, crc, true);
+    d1.setUint32(18, data.length, true);
+    d1.setUint32(22, data.length, true);
+    d1.setUint16(26, nameBytes.length, true);
+    d1.setUint16(28, 0, true);
+    lh.set(nameBytes, 30);
+    chunks.push(lh, data);
+
+    var cd = new Uint8Array(46 + nameBytes.length);
+    var d2 = new DataView(cd.buffer);
+    d2.setUint32(0, 0x02014b50, true);
+    d2.setUint16(4, 20, true);
+    d2.setUint16(6, 20, true);
+    d2.setUint16(8, 0x0800, true);
+    d2.setUint16(10, 0, true);
+    d2.setUint16(12, dosTime, true);
+    d2.setUint16(14, dosDate, true);
+    d2.setUint32(16, crc, true);
+    d2.setUint32(20, data.length, true);
+    d2.setUint32(24, data.length, true);
+    d2.setUint16(28, nameBytes.length, true);
+    d2.setUint16(30, 0, true);
+    d2.setUint16(32, 0, true);
+    d2.setUint16(34, 0, true);
+    d2.setUint16(36, 0, true);
+    d2.setUint32(38, 0, true);
+    d2.setUint32(42, offset, true);
+    cd.set(nameBytes, 46);
+    central.push(cd);
+
+    offset += lh.length + data.length;
+  });
+
+  var cdSize = central.reduce(function (a, b) { return a + b.length; }, 0);
+
+  var eocd = new Uint8Array(22);
+  var d3 = new DataView(eocd.buffer);
+  d3.setUint32(0, 0x06054b50, true);
+  d3.setUint16(4, 0, true);
+  d3.setUint16(6, 0, true);
+  d3.setUint16(8, files.length, true);
+  d3.setUint16(10, files.length, true);
+  d3.setUint32(12, cdSize, true);
+  d3.setUint32(16, offset, true);
+  d3.setUint16(20, 0, true);
+
+  var all = chunks.concat(central, [eocd]);
+  var total = all.reduce(function (a, b) { return a + b.length; }, 0);
+  var out = new Uint8Array(total);
+  var p = 0;
+  all.forEach(function (c) { out.set(c, p); p += c.length; });
+  return out;
+}
+
+var XLSX_CONTENT_TYPES =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<Types xmlns="http://schemas.openxmlformats.org/package/2006/content-types">' +
+'<Default Extension="rels" ContentType="application/vnd.openxmlformats-package.relationships+xml"/>' +
+'<Default Extension="xml" ContentType="application/xml"/>' +
+'<Override PartName="/xl/workbook.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet.main+xml"/>' +
+'<Override PartName="/xl/worksheets/sheet1.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.worksheet+xml"/>' +
+'<Override PartName="/xl/styles.xml" ContentType="application/vnd.openxmlformats-officedocument.spreadsheetml.styles+xml"/>' +
+'</Types>';
+
+var XLSX_ROOT_RELS =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/officeDocument" Target="xl/workbook.xml"/>' +
+'</Relationships>';
+
+var XLSX_WORKBOOK =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<workbook xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main" ' +
+'xmlns:r="http://schemas.openxmlformats.org/officeDocument/2006/relationships">' +
+'<sheets><sheet name="推荐明细" sheetId="1" r:id="rId1"/></sheets>' +
+'</workbook>';
+
+var XLSX_WORKBOOK_RELS =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<Relationships xmlns="http://schemas.openxmlformats.org/package/2006/relationships">' +
+'<Relationship Id="rId1" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/worksheet" Target="worksheets/sheet1.xml"/>' +
+'<Relationship Id="rId2" Type="http://schemas.openxmlformats.org/officeDocument/2006/relationships/styles" Target="styles.xml"/>' +
+'</Relationships>';
+
+var XLSX_STYLES =
+'<?xml version="1.0" encoding="UTF-8" standalone="yes"?>' +
+'<styleSheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">' +
+'<fonts count="3">' +
+  '<font><sz val="11"/><color rgb="FF1F2328"/><name val="微软雅黑"/></font>' +
+  '<font><b/><sz val="11"/><color rgb="FFFFFFFF"/><name val="微软雅黑"/></font>' +
+  '<font><b/><sz val="14"/><color rgb="FF00763B"/><name val="微软雅黑"/></font>' +
+'</fonts>' +
+'<fills count="4">' +
+  '<fill><patternFill patternType="none"/></fill>' +
+  '<fill><patternFill patternType="gray125"/></fill>' +
+  '<fill><patternFill patternType="solid"><fgColor rgb="FF00A050"/><bgColor indexed="64"/></patternFill></fill>' +
+  '<fill><patternFill patternType="solid"><fgColor rgb="FFE8F7EF"/><bgColor indexed="64"/></patternFill></fill>' +
+'</fills>' +
+'<borders count="2">' +
+  '<border><left/><right/><top/><bottom/><diagonal/></border>' +
+  '<border><left style="thin"><color rgb="FFD0D7DE"/></left><right style="thin"><color rgb="FFD0D7DE"/></right>' +
+  '<top style="thin"><color rgb="FFD0D7DE"/></top><bottom style="thin"><color rgb="FFD0D7DE"/></bottom><diagonal/></border>' +
+'</borders>' +
+'<cellStyleXfs count="1"><xf numFmtId="0" fontId="0" fillId="0" borderId="0"/></cellStyleXfs>' +
+'<cellXfs count="5">' +
+  '<xf numFmtId="0" fontId="0" fillId="0" borderId="0" xfId="0"/>' +
+  '<xf numFmtId="0" fontId="1" fillId="2" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+  '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment vertical="center"/></xf>' +
+  '<xf numFmtId="0" fontId="2" fillId="3" borderId="1" xfId="0" applyFont="1" applyFill="1" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+  '<xf numFmtId="0" fontId="0" fillId="0" borderId="1" xfId="0" applyBorder="1" applyAlignment="1"><alignment horizontal="center" vertical="center"/></xf>' +
+'</cellXfs>' +
+'<cellStyles count="1"><cellStyle name="Normal" xfId="0" builtinId="0"/></cellStyles>' +
+'</styleSheet>';
+
+function colLetter(i) { return String.fromCharCode(65 + i); }
+
+function buildSheetXml(list) {
+  var headers = ['序号','推荐人姓名','推荐人电话','推荐学员姓名','推荐学员年级',
+                 '推荐学员科目','推荐时间','填写人','提交账号','备注'];
+  var widths  = [6, 14, 16, 15, 13, 26, 21, 12, 26, 24];
+
+  var cols = widths.map(function (w, i) {
+    return '<col min="' + (i + 1) + '" max="' + (i + 1) + '" width="' + w + '" customWidth="1"/>';
+  }).join('');
+
+  var rowsXml = '';
+
+  rowsXml += '<row r="1" ht="28" customHeight="1">';
+  headers.forEach(function (_, i) {
+    rowsXml += '<c r="' + colLetter(i) + '1" s="3" t="inlineStr"><is><t>'
+             + escapeXml('新东方学校学员转介绍推荐记录') + '</t></is></c>';
+  });
+  rowsXml += '</row>';
+
+  rowsXml += '<row r="2" ht="22" customHeight="1">';
+  headers.forEach(function (h, i) {
+    rowsXml += '<c r="' + colLetter(i) + '2" s="1" t="inlineStr"><is><t>' + escapeXml(h) + '</t></is></c>';
+  });
+  rowsXml += '</row>';
+
+  list.forEach(function (r, idx) {
+    var rn = idx + 3;
+    var vals = [
+      String(idx + 1),
+      r.referrer_name || '',
+      r.referrer_phone || '',
+      r.student_name || '',
+      r.grade || '',
+      r.subjects || '',
+      fmtDateTime(r.recommended_at),
+      r.submitter || '',
+      r.owner_email || '',
+      r.note || ''
+    ];
+    rowsXml += '<row r="' + rn + '" ht="20" customHeight="1">';
+    vals.forEach(function (v, i) {
+      if (i === 0) {
+        rowsXml += '<c r="' + colLetter(i) + rn + '" s="4"><v>' + (idx + 1) + '</v></c>';
+      } else if (i === 6) {
+        rowsXml += '<c r="' + colLetter(i) + rn + '" s="4" t="inlineStr"><is><t>' + escapeXml(v) + '</t></is></c>';
+      } else {
+        rowsXml += '<c r="' + colLetter(i) + rn + '" s="2" t="inlineStr"><is><t xml:space="preserve">' + escapeXml(v) + '</t></is></c>';
+      }
+    });
+    rowsXml += '</row>';
+  });
+
+  return '<?xml version="1.0" encoding="UTF-8" standalone="yes"?>'
+    + '<worksheet xmlns="http://schemas.openxmlformats.org/spreadsheetml/2006/main">'
+    +   '<sheetViews><sheetView workbookViewId="0">'
+    +     '<pane ySplit="2" topLeftCell="A3" activePane="bottomLeft" state="frozen"/>'
+    +   '</sheetView></sheetViews>'
+    +   '<sheetFormatPr defaultRowHeight="18"/>'
+    +   '<cols>' + cols + '</cols>'
+    +   '<sheetData>' + rowsXml + '</sheetData>'
+    // ⚠️ 元素顺序必须严格遵循 OOXML 规范：autoFilter 在 mergeCells 之前。
+    // 反了的话 Excel 会判定文件损坏，弹"发现部分内容有问题"，恢复后表格是空的。
+    +   '<autoFilter ref="A2:J' + (list.length + 2) + '"/>'
+    +   '<mergeCells count="1"><mergeCell ref="A1:J1"/></mergeCells>'
+    + '</worksheet>';
+}
+
+function buildXlsxBlob(list) {
+  var zipBytes = makeZip([
+    { name: '[Content_Types].xml',        data: XLSX_CONTENT_TYPES },
+    { name: '_rels/.rels',                data: XLSX_ROOT_RELS },
+    { name: 'xl/workbook.xml',            data: XLSX_WORKBOOK },
+    { name: 'xl/_rels/workbook.xml.rels', data: XLSX_WORKBOOK_RELS },
+    { name: 'xl/styles.xml',              data: XLSX_STYLES },
+    { name: 'xl/worksheets/sheet1.xml',   data: buildSheetXml(list) }
+  ]);
+  return new Blob([zipBytes], {
+    type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'
+  });
+}
+
+$('exportXlsx').addEventListener('click', function () {
+  if (!state.isAdmin) { toast('仅管理员可导出', 'warn'); return; }
+  if (state.records.length === 0) { toast('暂无数据可导出', 'warn'); return; }
+  var now = new Date();
+  var stamp = fmtDate(now) + '_' + pad2(now.getHours()) + pad2(now.getMinutes());
+  try {
+    downloadBlob(buildXlsxBlob(state.records), '新东方学员转介绍推荐_' + stamp + '.xlsx');
+    toast('已导出 Excel，共 ' + state.records.length + ' 条', 'ok');
+  } catch (err) {
+    toast('导出失败：' + err.message, 'err');
+  }
+});
+
+$('exportCsv').addEventListener('click', function () {
+  if (!state.isAdmin) { toast('仅管理员可导出', 'warn'); return; }
+  if (state.records.length === 0) { toast('暂无数据可导出', 'warn'); return; }
+
+  var headers = ['序号','推荐人姓名','推荐人电话','推荐学员姓名','推荐学员年级',
+                 '推荐学员科目','推荐时间','填写人','提交账号','备注'];
+  function csvCell(v) {
+    var s = String(v == null ? '' : v);
+    return /[",\n\r]/.test(s) ? '"' + s.replace(/"/g, '""') + '"' : s;
+  }
+
+  var lines = [headers.map(csvCell).join(',')];
+  state.records.forEach(function (r, i) {
+    lines.push([i + 1, r.referrer_name, r.referrer_phone, r.student_name, r.grade,
+                r.subjects, fmtDateTime(r.recommended_at), r.submitter || '',
+                r.owner_email || '', r.note || ''
+               ].map(csvCell).join(','));
+  });
+
+  var blob = new Blob(['\ufeff' + lines.join('\r\n')], { type: 'text/csv;charset=utf-8' });
+  downloadBlob(blob, '新东方学员转介绍推荐_' + fmtDate(new Date()) + '.csv');
+  toast('已导出 CSV', 'ok');
+});
+
+/* =====================================================================
+ * 9. 时钟与启动
+ * ===================================================================== */
+function tickClock() { $('submitTimePreview').textContent = fmtDateTime(new Date()); }
+setInterval(tickClock, 1000);
+
+(function boot() {
+  tickClock();
+  setAuthMode('password');
+  $('suffixNote').innerHTML = '仅限 <b>@' + ALLOWED_DOMAIN + '</b> 邮箱注册';
+
+  if (!initCloud()) {
+    var box = document.createElement('div');
+    box.className = 'banner err';
+    box.style.margin = '16px 24px 0';
+    box.innerHTML = '<div><b>云端组件加载失败。</b>当前无法登录或提交数据，请检查网络后刷新页面。</div>';
+    document.querySelector('.page').prepend(box);
+    state.view = 'auth';
+    applyView();
+    return;
+  }
+
+  try {
+    cloud.auth.onAuthStateChange(function (event) {
+      if (event === 'SIGNED_OUT') {
+        state.session = null;
+        state.isAdmin = false;
+        state.records = [];
+        state.view = 'auth';
+        renderUserArea();
+        applyView();
+      }
+    });
+  } catch (e) { /* 忽略：老版本 SDK 可能没有该方法 */ }
+
+  refreshState();
+})();
+</script>
+</body>
+</html>
